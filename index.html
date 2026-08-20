@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Anuario digital de la Promocion 2026 del Liceo Campestre Thomas de Iriarte.">
+  <title>Prom 2026 | LCTI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#inicio" aria-label="Inicio del anuario">
+      <span class="brand-mark">LCTI</span>
+      <span><strong>Promoción</strong><small>Thomas de Iriarte · 2026</small></span>
+    </a>
+    <nav class="main-nav" aria-label="Navegación principal">
+      <a class="active" href="#galeria">La galería</a>
+      <a href="#recuerdos">Recuerdos</a>
+      <a href="#comunidad">La comunidad</a>
+    </nav>
+    <button class="button button-outline login-trigger" type="button">Ingresar <span aria-hidden="true">↗</span></button>
+    <button class="menu-toggle" aria-label="Abrir menú">☰</button>
+  </header>
+
+  <main id="inicio">
+    <section class="hero">
+      <div class="hero-image" role="img" aria-label="Estudiantes compartiendo en el colegio"></div>
+      <div class="hero-content">
+        <p class="eyebrow light">Un año para guardar</p>
+        <h1>Lo que vivimos<br><em>se queda aquí.</em></h1>
+        <p class="hero-copy">Un álbum construido entre todos para celebrar las personas, los lugares y las historias que hicieron de este año algo nuestro.</p>
+        <a class="button button-light" href="#galeria">Explorar el anuario <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="hero-note"><span>01</span><span>Promoción<br>2026</span></div>
+    </section>
+
+    <section class="intro section-pad" id="galeria">
+      <div class="intro-copy">
+        <p class="eyebrow">Nuestra promoción</p>
+        <h2>70 historias,<br><em>un mismo recuerdo.</em></h2>
+      </div>
+      <div class="intro-aside">
+        <p>Este es el álbum vivo de 11A, 11B y 11C. Encuentra a tus compañeros, vuelve a ese momento y deja unas palabras para el futuro.</p>
+        <div class="stats"><div><strong>70</strong><span>estudiantes</span></div><div><strong>03</strong><span>salones</span></div><div><strong>15</strong><span>profesores</span></div></div>
+      </div>
+    </section>
+
+    <section class="gallery-section section-pad">
+      <div class="section-heading"><div><p class="eyebrow">Personas</p><h2>Los protagonistas</h2></div><button class="text-button" id="contribute-trigger">+ Aportar un recuerdo</button></div>
+      <div class="gallery-tools"><div class="filters" role="group" aria-label="Filtrar por salón"><button class="filter active" data-filter="todos">Todos <small>70</small></button><button class="filter" data-filter="11A">11A <small>24</small></button><button class="filter" data-filter="11B">11B <small>23</small></button><button class="filter" data-filter="11C">11C <small>23</small></button></div><label class="search"><span>⌕</span><input id="search" type="search" placeholder="Buscar un nombre..." aria-label="Buscar un nombre"></label></div>
+      <div class="student-grid" id="student-grid"></div>
+      <button class="button button-dark more-button" id="more-button">Ver más compañeros <span>↓</span></button>
+    </section>
+
+    <section class="memory-section section-pad" id="recuerdos">
+      <div class="memory-image"><img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=85" alt="Grupo de estudiantes reunidos"></div>
+      <div class="memory-copy"><p class="eyebrow">La memoria sigue</p><h2>Las mejores historias todavía <em>no se han contado.</em></h2><p>Sube una foto, escribe una anécdota o guarda ese momento que no quieres que se pierda. Este álbum crece con cada aporte.</p><button class="button button-dark" id="memory-trigger">Compartir un recuerdo <span>↗</span></button></div>
+    </section>
+
+    <section class="community section-pad" id="comunidad"><p class="eyebrow">Voces de la promoción</p><h2>Palabras que<br><em>nos llevamos.</em></h2><div class="quote-row"><blockquote>“Gracias por hacer que cada día en el colegio tuviera una historia que contar.”<cite>— Manuela R. · 11B</cite></blockquote><blockquote>“Nos vemos en el futuro, pero esta versión de nosotros queda para siempre.”<cite>— Santiago M. · 11A</cite></blockquote><blockquote>“Qué bonito poder volver a este lugar cuando queramos.”<cite>— Valentina P. · 11C</cite></blockquote></div></section>
+  </main>
+
+  <footer><div class="brand"><span class="brand-mark">LCTI</span><span><strong>Promoción</strong><small>Thomas de Iriarte · 2026</small></span></div><p>Un proyecto para recordar juntos.</p><span>© 2026 Liceo Campestre Thomas de Iriarte</span></footer>
+
+  <div class="modal-backdrop" id="modal-backdrop" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button class="modal-close" aria-label="Cerrar">×</button><p class="eyebrow">Comunidad Thomasina</p><h2 id="modal-title">Deja tu huella<br><em>en el anuario.</em></h2><p id="modal-copy">Para escribir mensajes y compartir recuerdos, crea tu cuenta de la comunidad.</p><form id="modal-form"><label>Tu nombre<input required name="name" type="text" placeholder="Ej. Laura Gómez"></label><label>Tu correo<input required name="email" type="email" placeholder="tu@correo.com"></label><button class="button button-dark" type="submit">Crear mi cuenta <span>↗</span></button></form><p class="modal-foot">Tus datos serán tratados según la política del colegio.</p></section></div>
+  <script src="script.js"></script>
+</body>
+</html>
