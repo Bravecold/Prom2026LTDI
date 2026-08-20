@@ -37,7 +37,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), database: Session = De
         user_id = int(payload.get("sub", ""))
     except (jwt.InvalidTokenError, ValueError):
         raise credentials_error from None
-    user = database.scalar(select(User).where(User.id == user_id, User.is_active.is_(True)))
+    user = database.scalar(select(User).where(User.id == user_id, User.is_active.is_(True), User.is_approved.is_(True)))
     if user is None:
         raise credentials_error
     return user

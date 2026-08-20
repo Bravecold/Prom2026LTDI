@@ -9,8 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <style>.auth-locked main,.auth-locked footer{display:none}.auth-gate{min-height:calc(100vh - 82px);background:var(--green);color:var(--white);display:grid;place-items:center;padding:70px 8%}.auth-gate-inner{width:min(100%,460px)}.auth-gate h1{font:600 clamp(42px,6vw,70px)/1 var(--serif);margin:0 0 24px}.auth-gate h1 em{color:var(--coral)}.auth-gate p:not(.eyebrow):not(.auth-status){line-height:1.7;color:#d8e7f4;max-width:390px}.auth-gate label{display:block;color:#d8e7f4;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:18px 0}.auth-gate input{display:block;width:100%;padding:14px;margin-top:7px;border:1px solid #7092b2;background:#f9fcff;color:var(--ink);outline-color:var(--coral)}.auth-gate .button{width:100%;margin-top:12px}.auth-gate .text-button{color:#f3c0c9;margin-top:26px}.auth-status{color:#f3c0c9;font-size:12px;min-height:18px}</style>
 </head>
-<body>
+<body class="auth-locked">
   <header class="site-header">
     <a class="brand" href="#inicio" aria-label="Inicio del anuario">
       <span class="brand-mark">LCTI</span>
@@ -24,6 +25,21 @@
     <button class="button button-outline login-trigger" type="button">Ingresar <span aria-hidden="true">↗</span></button>
     <button class="menu-toggle" aria-label="Abrir menú">☰</button>
   </header>
+
+  <section class="auth-gate" id="auth-gate" aria-labelledby="auth-title">
+    <div class="auth-gate-inner">
+      <p class="eyebrow">Comunidad Thomasina</p>
+      <h1 id="auth-title">Este recuerdo<br><em>es para nosotros.</em></h1>
+      <p>Para proteger las fotografías y las historias de la promoción, ingresa con una cuenta autorizada por el colegio.</p>
+      <form id="access-form">
+        <label>Correo institucional<input required name="email" type="email" autocomplete="email" placeholder="tu@correo.com"></label>
+        <label>Contraseña<input required name="password" type="password" autocomplete="current-password" placeholder="Tu contraseña"></label>
+        <button class="button button-dark" type="submit">Ingresar al anuario <span>↗</span></button>
+      </form>
+      <button class="text-button" id="access-register" type="button">Crear una cuenta de la comunidad</button>
+      <p class="auth-status" id="auth-status" role="status"></p>
+    </div>
+  </section>
 
   <main id="inicio">
     <section class="hero">
@@ -65,7 +81,8 @@
 
   <footer><div class="brand"><span class="brand-mark">LCTI</span><span><strong>Promoción</strong><small>Thomas de Iriarte · 2026</small></span></div><p>Un proyecto para recordar juntos.</p><span>© 2026 Liceo Campestre Thomas de Iriarte</span></footer>
 
-  <div class="modal-backdrop" id="modal-backdrop" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button class="modal-close" aria-label="Cerrar">×</button><p class="eyebrow">Comunidad Thomasina</p><h2 id="modal-title">Deja tu huella<br><em>en el anuario.</em></h2><p id="modal-copy">Para escribir mensajes y compartir recuerdos, crea tu cuenta de la comunidad.</p><form id="modal-form"><label>Tu nombre<input required name="name" type="text" placeholder="Ej. Laura Gómez"></label><label>Tu correo<input required name="email" type="email" placeholder="tu@correo.com"></label><button class="button button-dark" type="submit">Crear mi cuenta <span>↗</span></button></form><p class="modal-foot">Tus datos serán tratados según la política del colegio.</p></section></div>
+  <div class="modal-backdrop" id="modal-backdrop" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button class="modal-close" aria-label="Cerrar">×</button><p class="eyebrow">Comunidad Thomasina</p><h2 id="modal-title">Deja tu huella<br><em>en el anuario.</em></h2><p id="modal-copy">Para escribir mensajes y compartir recuerdos, crea tu cuenta de la comunidad.</p><form id="modal-form"><label>Tu nombre<input required name="name" type="text" placeholder="Ej. Laura Gómez"></label><label>Tu correo<input required name="email" type="email" placeholder="tu@correo.com"></label><label>Contraseña<input required name="password" type="password" minlength="8" placeholder="Mínimo 8 caracteres"></label><button class="button button-dark" type="submit">Crear mi cuenta <span>↗</span></button></form><p class="modal-foot">Tus datos serán tratados según la política del colegio.</p></section></div>
+  <script src="config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

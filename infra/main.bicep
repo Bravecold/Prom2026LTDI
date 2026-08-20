@@ -1,7 +1,6 @@
 param appName string = 'prom2026lcti'
 param location string = resourceGroup().location
 param databaseLocation string = 'centralus'
-param containerImage string
 param apiImage string
 param acrLoginServer string
 @secure()
@@ -12,6 +11,8 @@ param acrPassword string
 param postgresAdminPassword string
 @secure()
 param jwtSecret string
+@secure()
+param adminApprovalToken string
 param postgresAdminUser string = 'promadmin'
 param frontendUrl string
 
@@ -109,52 +110,6 @@ resource photoContainer 'Microsoft.Storage/storageAccounts/blobServices/containe
   }
 }
 
-resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
-  name: appName
-  location: location
-  properties: {
-    managedEnvironmentId: containerEnvironment.id
-    configuration: {
-      activeRevisionsMode: 'Single'
-      registries: [
-        {
-          server: acrLoginServer
-          username: acrUsername
-          passwordSecretRef: 'acr-password'
-        }
-      ]
-      secrets: [
-        {
-          name: 'acr-password'
-          value: acrPassword
-        }
-      ]
-      ingress: {
-        external: true
-        targetPort: 80
-        transport: 'auto'
-        allowInsecure: false
-      }
-    }
-    template: {
-      containers: [
-        {
-          name: 'web'
-          image: containerImage
-          resources: {
-            cpu: json('0.25')
-            memory: '0.5Gi'
-          }
-        }
-      ]
-      scale: {
-        minReplicas: 0
-        maxReplicas: 2
-      }
-    }
-  }
-}
-
 resource apiApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: apiName
   location: location
@@ -183,6 +138,10 @@ resource apiApp 'Microsoft.App/containerApps@2024-03-01' = {
           value: jwtSecret
         }
         {
+          name: 'admin-approval-token'
+          value: adminApprovalToken
+        }
+        {
           name: 'storage-connection-string'
           value: 'DefaultEndpointsProtocol=https;AccountName=${storage.name};AccountKey=${storage.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
         }
@@ -207,6 +166,10 @@ resource apiApp 'Microsoft.App/containerApps@2024-03-01' = {
             {
               name: 'JWT_SECRET'
               secretRef: 'jwt-secret'
+            }
+            {
+              name: 'ADMIN_APPROVAL_TOKEN'
+              secretRef: 'admin-approval-token'
             }
             {
               name: 'AZURE_STORAGE_CONNECTION_STRING'
@@ -235,6 +198,6 @@ resource apiApp 'Microsoft.App/containerApps@2024-03-01' = {
   }
 }
 
-output siteUrl string = 'https://${containerApp.properties.configuration.ingress.fqdn}'
+output siteUrl string = storage.properties.primaryEndpoints.web
 output apiUrl string = 'https://${apiApp.properties.configuration.ingress.fqdn}'
 output postgresServer string = postgres.properties.fullyQualifiedDomainName

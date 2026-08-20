@@ -1,17 +1,19 @@
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile, status
+import secrets
+
+from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session, joinedload
 
 from .auth import create_access_token, get_current_user, hash_password, verify_password
 from .config import get_settings
 from .db import Base, engine, get_db
 from .models import Comment, Photo, Student, User
-from .schemas import CommentCreate, CommentRead, PhotoRead, StudentRead, Token, UserCreate, UserRead
+from .schemas import CommentCreate, CommentRead, PendingUserRead, PhotoRead, StudentRead, Token, UserCreate, UserRead
 from .storage import save_photo
 
 settings = get_settings()
@@ -22,6 +24,9 @@ app.add_middleware(CORSMiddleware, allow_origins=settings.allowed_origins, allow
 @app.on_event("startup")
 def create_tables() -> None:
     Base.metadata.create_all(bind=engine)
+    with engine.begin() as connection:
+        connection.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS is_approved BOOLEAN NOT NULL DEFAULT FALSE"))
+        connection.execute(text("CREATE INDEX IF NOT EXISTS ix_users_is_approved ON users (is_approved)"))
 
 
 @app.get("/api/health")
@@ -44,6 +49,8 @@ def register(payload: UserCreate, database: Session = Depends(get_db)) -> User:
 @app.post("/api/auth/login", response_model=Token)
 def login(form: OAuth2PasswordRequestForm = Depends(), database: Session = Depends(get_db)) -> Token:
     user = database.scalar(select(User).where(User.email == form.username.lower()))
+    if user is not None and verify_password(form.password, user.password_hash) and not user.is_approved:
+        raise HTTPException(status_code=403, detail="Tu cuenta esta pendiente de aprobacion por el colegio")
     if user is None or not verify_password(form.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Correo o contrasena incorrectos", headers={"WWW-Authenticate": "Bearer"})
     return Token(access_token=create_access_token(user.id))
@@ -54,8 +61,29 @@ def me(user: User = Depends(get_current_user)) -> User:
     return user
 
 
+def require_admin(x_admin_token: str | None = Header(default=None)) -> None:
+    if not x_admin_token or not secrets.compare_digest(x_admin_token, settings.admin_approval_token):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Autorizacion administrativa requerida")
+
+
+@app.get("/api/admin/pending-users", response_model=list[PendingUserRead], dependencies=[Depends(require_admin)])
+def pending_users(database: Session = Depends(get_db)) -> list[User]:
+    return list(database.scalars(select(User).where(User.is_approved.is_(False), User.is_active.is_(True)).order_by(User.created_at)).all())
+
+
+@app.post("/api/admin/users/{user_id}/approve", response_model=UserRead, dependencies=[Depends(require_admin)])
+def approve_user(user_id: int, database: Session = Depends(get_db)) -> User:
+    user = database.get(User, user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="Solicitud no encontrada")
+    user.is_approved = True
+    database.commit()
+    database.refresh(user)
+    return user
+
+
 @app.get("/api/students", response_model=list[StudentRead])
-def list_students(classroom: str | None = None, database: Session = Depends(get_db)) -> list[Student]:
+def list_students(classroom: str | None = None, user: User = Depends(get_current_user), database: Session = Depends(get_db)) -> list[Student]:
     statement = select(Student).order_by(Student.classroom, Student.name)
     if classroom:
         statement = statement.where(Student.classroom == classroom.upper())
@@ -82,7 +110,7 @@ async def upload_photo(student_id: int | None = Form(default=None), caption: str
 
 
 @app.get("/api/photos/{photo_id}/comments", response_model=list[CommentRead])
-def list_comments(photo_id: int, database: Session = Depends(get_db)) -> list[Comment]:
+def list_comments(photo_id: int, user: User = Depends(get_current_user), database: Session = Depends(get_db)) -> list[Comment]:
     statement = select(Comment).options(joinedload(Comment.author)).where(Comment.photo_id == photo_id, Comment.approved.is_(True)).order_by(Comment.created_at)
     return list(database.scalars(statement).unique().all())
 

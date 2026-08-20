@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://prom:prom@localhost:5432/prom2026"
     jwt_secret: str = "change-this-secret-before-production"
     jwt_algorithm: str = "HS256"
+    admin_approval_token: str = "change-this-admin-token-before-production"
     access_token_minutes: int = 60
     storage_directory: str = "media"
     azure_storage_connection_string: str | None = None

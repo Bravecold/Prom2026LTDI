@@ -17,6 +17,10 @@ class UserRead(BaseModel):
     email: EmailStr
 
 
+class PendingUserRead(UserRead):
+    created_at: datetime
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
